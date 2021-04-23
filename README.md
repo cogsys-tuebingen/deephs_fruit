@@ -20,11 +20,17 @@ The code is divided into subfolders, which correspond to the use cases:
 ## Citation
 The paper will be presented on the IJCNN 2021.
 ```
-@article{TODO str,
-        title={TODO title},
-        author={TODO authors},
-        journal={TODO arxiv},
-        year={TODO year}
+@article{Varga2021,
+abstract = {We present a system to measure the ripeness of fruit with a hyperspectral camera and a suitable deep neural network architecture. This architecture did outperform competitive baseline models on the prediction of the ripeness state of fruit. For this, we recorded a data set of ripening avocados and kiwis, which we make public. We also describe the process of data collection in a manner that the adaption for other fruit is easy. The trained network is validated empirically, and we investigate the trained features. Furthermore, a technique is introduced to visualize the ripening process.},
+archivePrefix = {arXiv},
+arxivId = {2104.09808},
+author = {Varga, Leon Amadeus and Makowski, Jan and Zell, Andreas},
+eprint = {2104.09808},
+month = {apr},
+title = {{Measuring the Ripeness of Fruit with Hyperspectral Imaging and Deep Learning}},
+url = {http://arxiv.org/abs/2104.09808},
+year = {2021}
 }
+
 ```
 
