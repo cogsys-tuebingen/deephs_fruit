@@ -14,7 +14,8 @@ import core.spectral_io as spectral_io
 
 def mask_background(_envi_data):
     _background_mask, _envi_data = get_background_mask(_envi_data)
-    _background_mask = np.matmul(_background_mask, [[[True for i in range(_envi_data.shape[2])]]])
+    _background_mask = np.matmul(
+        _background_mask, [[[True for i in range(_envi_data.shape[2])]]])
     _envi_data = np.ma.masked_array(_envi_data, mask=_background_mask)
     return _envi_data
 
@@ -31,13 +32,16 @@ def get_background_mask(_envi_data):
 
 def get_n_spectra(_envi_data, _num, _only_obj):
     if not _only_obj:
-        _used_data = _envi_data.reshape(_envi_data.shape[0] * _envi_data.shape[1], -1)
+        _used_data = _envi_data.reshape(
+            _envi_data.shape[0] * _envi_data.shape[1], -1)
         _pixel_ids = np.random.randint(0, _used_data.shape[0], _num)
         _spectra = _used_data[_pixel_ids, :]
     else:
         _masked_envi = mask_background(_envi_data)
-        _used_data = _masked_envi.reshape(_masked_envi.shape[0] * _masked_envi.shape[1], -1)
-        _used_data = _used_data[np.logical_not(_used_data[:, 0].mask).squeeze()]
+        _used_data = _masked_envi.reshape(
+            _masked_envi.shape[0] * _masked_envi.shape[1], -1)
+        _used_data = _used_data[np.logical_not(
+            _used_data[:, 0].mask).squeeze()]
 
         _pixel_ids = np.random.randint(0, len(_used_data), _num)
         _spectra = _used_data[_pixel_ids, :]
@@ -55,7 +59,8 @@ def display_hyper_spectral_data(_data, _band=None):
         ims = []
 
         for i in range(_data.shape[2]):
-            ims.append([plt.imshow(_data[:, :, i].squeeze(), animated=True, cmap=cmap)])
+            ims.append(
+                [plt.imshow(_data[:, :, i].squeeze(), animated=True, cmap=cmap)])
 
         anim = animation.ArtistAnimation(fig, ims, interval=60, blit=True)
 
@@ -107,7 +112,8 @@ def write_array_image(_img, _name):
         _normalized_img = _img.reshape(-1, _img.shape[2])
         # TODO: problems with negative values, they move the average around
         # _normalized_img = _normalized_img.clip(0, None)
-        _normalized_img = (_normalized_img - _normalized_img.min(axis=0)) / (_normalized_img - _normalized_img.min(axis=0)).max(axis=0)
+        _normalized_img = (_normalized_img - _normalized_img.min(axis=0)) / \
+            (_normalized_img - _normalized_img.min(axis=0)).max(axis=0)
         _normalized_img = _normalized_img.reshape(_img.shape)
         _img = _normalized_img
 
@@ -131,8 +137,23 @@ def load_image_array(_name):
 def get_wavelengths_for(_c: CameraType):
     if _c == CameraType.VIS:
         return spectral_io.VIS_BANDS
+    if _c == CameraType.VIS_COR:
+        return spectral_io.VIS_COR_BANDS
     if _c == CameraType.NIR:
-            return spectral_io.NIR_BANDS
+        return spectral_io.NIR_BANDS
+
+    raise Exception("Unkown camera_type")
+
+
+def get_camera_type_by_bands(bands: int):
+    if bands == len(spectral_io.VIS_BANDS):
+        return CameraType.VIS
+    if bands == len(spectral_io.NIR_BANDS):
+        return CameraType.NIR
+    if bands == len(spectral_io.VIS_COR_BANDS):
+        return CameraType.VIS_COR
+
+    raise Exception("Unkown camera_type")
 
 
 def plot_spectra(_spectra, _bands, _legend=None, _areas=None):
@@ -148,7 +169,8 @@ def plot_spectra(_spectra, _bands, _legend=None, _areas=None):
         for _c, _s in enumerate(_spectra):
             plt.plot(_bands, _s)
             if _areas is not None:
-                plt.fill_between(_bands, _areas[_c]['min'], _areas[_c]['max'], alpha=0.2)
+                plt.fill_between(
+                    _bands, _areas[_c]['min'], _areas[_c]['max'], alpha=0.2)
 
     if _legend is not None:
         plt.legend(_legend)
@@ -208,7 +230,8 @@ def mem_report():
     print("### BEGIN - Memory Report ###")
     for obj in gc.get_objects():
         if torch.is_tensor(obj):
-            print("# \t %s : device %s with size %s" % (type(obj), obj.device, obj.size()))
+            print("# \t %s : device %s with size %s" %
+                  (type(obj), obj.device, obj.size()))
     print("### END - Memory Report ###")
 
 
@@ -227,5 +250,16 @@ class MemoryCheckpoint:
         print("### BEGIN - Memory Report since Checkpoint ###")
         for obj in gc.get_objects():
             if torch.is_tensor(obj) and obj not in self.mem_report_checkpoint_objs:
-                print("# \t %s : device %s with size %s" % (type(obj), obj.device, obj.size()))
+                print("# \t %s : device %s with size %s" %
+                      (type(obj), obj.device, obj.size()))
         print("### END - Memory Report ###")
+
+
+def get_wandb_log_dir():
+    import os
+    dir = os.environ.get('WANDB_LOG_DIR')
+
+    if dir is not None:
+        os.makedirs(dir, exist_ok=True)
+
+    return dir

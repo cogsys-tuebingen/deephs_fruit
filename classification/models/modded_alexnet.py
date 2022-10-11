@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torchvision.models.utils import load_state_dict_from_url
 
 """
 This is a adapted version of the PyTorch AlexNet implementation.
@@ -45,7 +44,7 @@ class AlexNet(nn.Module):
             nn.Linear(4096, num_classes),
         )
 
-    def forward(self, x):
+    def forward(self, x, channel_wavelengths=None):
         x = self.features(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)

@@ -5,8 +5,8 @@ import argparse
 
 from core.name_convention import *
 import core.fruit_list as fruit_list
-from core.hyperspectral_dataset import get_records
-from core.hyperspectral_dataset import extract_val_data, extract_test_data
+from core.datasets.hyperspectral_dataset import get_records
+from core.datasets.hyperspectral_dataset import extract_val_data, extract_test_data
 
 
 
@@ -15,7 +15,7 @@ def test_knn_with_fixed_test_set(X_train, y_train, X_test, y_test, silence=False
     # create a dictionary of all values we want to test for n_neighbors
     param_grid = {'n_neighbors': np.arange(1, 10)}
     # use gridsearch to test all values for n_neighbors
-    knn_gscv = GridSearchCV(knn, param_grid, cv=2, iid=False)
+    knn_gscv = GridSearchCV(knn, param_grid, cv=2)
     # fit model to data
     knn_gscv.fit(X_train, y_train)
     score = knn_gscv.score(X_test, y_test)

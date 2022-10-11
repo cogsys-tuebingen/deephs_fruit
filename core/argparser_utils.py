@@ -23,12 +23,14 @@ def str2cameratype(v):
         return v
     if v.lower() == 'vis':
         return name_convention.CameraType.VIS
+    if v.lower() == 'vis_cor':
+        return name_convention.CameraType.VIS_COR
     elif v.lower() == 'nir':
         return name_convention.CameraType.NIR
     elif v.lower() == 'rgb':
         return name_convention.CameraType.RGB
     else:
-        raise argparse.ArgumentTypeError('VIS, NIR or RGB expected')
+        raise argparse.ArgumentTypeError('VIS, VIS_COR, NIR or RGB expected')
 
 
 def str2fruit(v):
@@ -38,8 +40,16 @@ def str2fruit(v):
         return name_convention.Fruit.AVOCADO
     elif v.lower() == 'kiwi':
         return name_convention.Fruit.KIWI
+    elif v.lower() == 'mango':
+        return name_convention.Fruit.MANGO
+    elif v.lower() == 'kaki':
+        return name_convention.Fruit.KAKI
+    elif v.lower() == 'papaya':
+        return name_convention.Fruit.PAPAYA
+    elif v.lower() == 'all':
+        return name_convention.Fruit.ALL
     else:
-        raise argparse.ArgumentTypeError('AVOCADO or KIWI expected')
+        raise argparse.ArgumentTypeError(f'{[e.value for e in name_convention.Fruit]} expected')
 
 
 def str2side(v):

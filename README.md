@@ -1,24 +1,62 @@
 # Measuring the Ripeness of Fruit with Hyperspectral Imaging and Deep Learning
 
-Here you can find the dataset and the official implementation of the HS-CNN network.
+    Version 2:
+        - The training is now more stable
+        - Added new hyperspectral recordings
+        - Added HyveConv++ model
 
-## Dataset
-The dataset is [here](https://cloud.cs.uni-tuebingen.de/index.php/s/nWKxxtN5wM9fz5E) available. It contains 1038 hyperspectral recordings of avocados and 1522 hyperspectral recordings of kiwis. The ripening process from unripe to overripe is covered. Because of the destructive manner of the labeling process, only 180 avocado recordings and 262 kiwis recordings are labeled by indicator measurements.
-Two cameras (Specim FX 10 and INNO-SPEC Redeye 1.7) were used. The two measurement series cover a total of 28 days in the years 2019 and 2020.
+    Version 1 is still avaiable on branch 'paper_version' 
 
-## HS-CNN
-This is the official implementation of the HS-CNN network. The implementation is based on PyTorch and PyTorch Lightning.
+Here you can find the dataset and the official implementation of the HS-CNN network with an optimized training pipeline.
 
-The code is divided into subfolders, which correspond to the use cases:
- - 'classification' contains the training process for the classification task. Here you can find the implementation of HS-CNN, AlexNet, ResNet-18, SVM and kNN.
- - 'extract_fruit' trains a layer classifier and extracts the fruits.
- - 'false_color_images' defines the two stage training process of the autoencoder and the classification network. This allows the visualization of the ripening process.
- - 'core' contains the basic components. (IO, loss functions)
+## Data set (v2)
+The dataset is [here](https://cloud.cs.uni-tuebingen.de/index.php/s/nWKxxtN5wM9fz5E) available. 
+It contains recordings of:
+ - Avocados
+ - Kiwis
+ - Persimmons
+ - Papayas
+ - Mango
 
+Three hyperspectral cameras were use:
+ - Specim FX 10
+ - INNO-SPEC Redeye 1.7
+ - Corning microHSI 410 Vis-NIR Hyperspectral Sensor
 
-             
+The data set covers four measurement series. Labels are provided as destructive measurements (fruit flesh firmness, sugar content and overall ripeness)
+
+### Requirements
+ - Python 3.10
+ - PyTorch 1.11.0
+and the packages defined in the requirements file (```pip3 install -r requirements.txt```)
+ - Download the data set to a local folder
+
+## How to train
+If all packages are installed and the data set was downloaded, the training can start.
+This will train the HS-CNN model on the ripeness classification of avocados:
+
+    PYTHONPATH=$PYTHONPATH:. python3 classification/train.py --data_path /folder/of/downloaded/dataset/ --model deephs_net --fruit avocado --classification_type ripeness --seed 23312323
+
+<img src="images/deephs_net_loss.png" alt="Loss" style="width: 300px;"/><br>
+<img src="images/deephs_net_accuracy.png" alt="Accuracy" style="width: 300px;"/><br>
+<img src="images/deephs_net_confusion.png" alt="Confusion" style="width: 300px;"/><br>
+**Figure 1** - Training of HS-CNN:
+  
+And this will train HS-CNN + HyveConv++ on the same classification task:
+
+    PYTHONPATH=$PYTHONPATH:. python3 classification/train.py --data_path /folder/of/downloaded/dataset/ --model hyve --fruit avocado --classification_type ripeness --seed 23312323
+
+<img src="images/hyve_loss.png" alt="Loss" style="width: 300px;"/><br>
+<img src="images/hyve_accuracy.png" alt="Accuracy" style="width: 300px;"/><br>
+<img src="images/hyve_confusion.png" alt="Confusion" style="width: 300px;"/><br>
+**Figure 2** - Training of HS-CNN + HyveConv++:
+
+```PYTHONPATH=$PYTHONPATH:. python3 classification/train.py --help``` provides helpful information regarding the parameters. 
+For more information about the training framework PyTorch-Lightning, we refer to the official documentation (https://pytorch-lightning.readthedocs.io/en/latest/).
+
+            
 ## Citation
-The paper was be presented on IJCNN 2021.
+The paper was presented on IJCNN 2021.
 ```
 @inproceedings{Varga2021,
 abstract = {We present a system to measure the ripeness of fruit with a hyperspectral camera and a suitable deep neural network architecture. This architecture did outperform competitive baseline models on the prediction of the ripeness state of fruit. For this, we recorded a data set of ripening avocados and kiwis, which we make public. We also describe the process of data collection in a manner that the adaption for other fruit is easy. The trained network is validated empirically, and we investigate the trained features. Furthermore, a technique is introduced to visualize the ripening process.},
@@ -39,4 +77,6 @@ year = {2021}
 }
 
 ```
+For HyveConv++ please check: https://github.com/cogsys-tuebingen/hyve_conv
+
 

@@ -1,6 +1,6 @@
 import os
 import enum
-from typing import Union
+from typing import Union, Optional
 
 import core.spectral_io as spectral_io
 
@@ -41,10 +41,32 @@ class Day(enum.Enum):
     DAY_M2_15 = 'day_m2_15'
     DAY_M2_16 = 'day_m2_16'
     DAY_M2_17 = 'day_m2_17'
+    DAY_M3_1 = 'day_1_m3'
+    DAY_M3_2 = 'day_2_m3'
+    DAY_M3_3 = 'day_3_m3'
+    DAY_M3_4 = 'day_4_m3'
+    DAY_M3_5 = 'day_5_m3'
+    DAY_M3_6 = 'day_6_m3'
+    DAY_M3_7 = 'day_7_m3'
+    DAY_M3_8 = 'day_8_m3'
+    DAY_M3_9 = 'day_9_m3'
+    DAY_M3_10 = 'day_10_m3'
+    DAY_M3_11 = 'day_11_m3'
+    DAY_M3_12 = 'day_12_m3'
+    DAY_M4_1 = 'day_m4_01'
+    DAY_M4_2 = 'day_m4_02'
+    DAY_M4_3 = 'day_m4_03'
+    DAY_M4_4 = 'day_m4_04'
+    DAY_M4_5 = 'day_m4_05'
+    DAY_M4_6 = 'day_m4_06'
+    DAY_M4_7 = 'day_m4_07'
+    DAY_M4_8 = 'day_m4_08'
+    DAY_M4_9 = 'day_m4_09'
 
 
 class CameraType(enum.Enum):
     VIS = 'VIS'
+    VIS_COR = 'VIS_COR'
     NIR = 'NIR'
     RGB = 'RGB'
 
@@ -52,6 +74,10 @@ class CameraType(enum.Enum):
 class Fruit(enum.Enum):
     AVOCADO = 'Avocado'
     KIWI = 'Kiwi'
+    MANGO = 'Mango'
+    KAKI = 'Kaki'
+    PAPAYA = 'Papaya'
+    ALL = 'All'
 
 
 class ID(enum.Enum):
@@ -163,7 +189,6 @@ class DATASET_TYPE(enum.Enum):
     TEST = "test"
 
 
-
 def get_file_path(fruit: Fruit, side: Side, day: Day, id: ID, camera_type: CameraType):
     name = get_name(fruit, id, side, day)
     file_name = os.path.join(fruit.value.capitalize(), camera_type.value.upper(), day.value.lower(), name)
@@ -171,22 +196,22 @@ def get_file_path(fruit: Fruit, side: Side, day: Day, id: ID, camera_type: Camer
     return file_name
 
 
-def get_name(fruit: Fruit, id:ID, side: Side, day: Day):
+def get_name(fruit: Fruit, id: ID, side: Side, day: Day):
     if day == Day.TEST_1 or day == Day.TEST_2:
         name = fruit.value.lower() + "_" + day.value.lower() + "_" + side.value.lower()
     else:
-        name = fruit.value.lower() + "_" + day.value.lower() + "_" + id.value + "_" + side.value.lower()
+        name = fruit.value.lower() + "_" + day.value.lower() + "_" + \
+            id.value + "_" + side.value.lower()
     return name
 
 
-def get_unique_name(fruit: Fruit, id:ID, side: Side, day: Day, camera_type:CameraType, postfix: str = None):
-
+def get_unique_name(fruit: Fruit, id: ID, side: Side, day: Day, camera_type: CameraType, postfix: str = None):
     if postfix is None:
-        name = fruit.value.lower() + "_" + day.value.lower() + "_" + id.value +\
-               "_" + side.value.lower() + "_" + camera_type.value.lower()
+        name = fruit.value.lower() + "_" + day.value.lower() + "_" + id.value + \
+            "_" + side.value.lower() + "_" + camera_type.value.lower()
     else:
-        name = fruit.value.lower() + "_" + day.value.lower() + "_" + id.value +\
-               "_" + side.value.lower() + "_" + camera_type.value.lower() + "_" + postfix
+        name = fruit.value.lower() + "_" + day.value.lower() + "_" + id.value + \
+            "_" + side.value.lower() + "_" + camera_type.value.lower() + "_" + postfix
     return name
 
 
@@ -196,6 +221,7 @@ class RipenessState(enum.Enum):
     PERFECT = 'perfect'  # necessary?
     NEAR_OVERRIPE = 'near_overripe'  # necessary?
     OVERRIPE = 'overripe'
+    UNKNOWN = 'unknown'
 
 
 def ripeness2int(_ripeness_state: RipenessState):
@@ -231,7 +257,7 @@ def ripeness2color(_ripeness: RipenessState):
         return 'y'
     if _ripeness == RipenessState.OVERRIPE:
         return 'r'
-    
+
     return 'b'
 
 
@@ -332,7 +358,8 @@ class AvocadoLabel:
             return FirmnessLevel.READY
 
 
-class KiwiLabel:
+
+class SweetFruitLabel:
     def __init__(self, _init_weight: int, _end_weight: int, _storage_days: int, _firmness: int, _sugar_content: float,
                  _ripeness_state: RipenessState, _comment: str = None):
         self.init_weight = _init_weight
@@ -352,6 +379,19 @@ class KiwiLabel:
                 self.ripeness_state.value, self.firmness, self.sugar_content)
 
     def get_firmness_level(self) -> FirmnessLevel:
+        raise NotImplementedError()
+    
+    def get_sugar_level(self) -> SugarLevel:
+        raise NotImplementedError()
+
+
+class KiwiLabel(SweetFruitLabel):
+    def __init__(self, _init_weight: int, _end_weight: int, _storage_days: int, _firmness: int, _sugar_content: float,
+                 _ripeness_state: RipenessState, _comment: str = None):
+        super().__init__(_init_weight, _end_weight, _storage_days, _firmness, _sugar_content, _ripeness_state,
+                         _comment)
+
+    def get_firmness_level(self) -> FirmnessLevel:
         if self.firmness > 1500:
             return FirmnessLevel.TOO_HARD
         elif self.firmness < 1000:
@@ -368,11 +408,81 @@ class KiwiLabel:
             return SugarLevel.READY
 
 
-import core.util as util
+class KakiLabel(SweetFruitLabel):
+    def __init__(self, _init_weight: int, _end_weight: int, _storage_days: int, _firmness: int, _sugar_content: float,
+                 _ripeness_state: RipenessState, _comment: str = None):
+        super().__init__(_init_weight, _end_weight, _storage_days, _firmness, _sugar_content, _ripeness_state,
+                         _comment)
+
+    def get_sugar_level(self) -> SugarLevel:
+        if self.sugar_content < 20:
+            return SugarLevel.NOT_SWEET
+        elif self.sugar_content > 22:
+            return SugarLevel.TOO_SWEET
+        else:
+            return SugarLevel.READY
+
+    def get_firmness_level(self) -> FirmnessLevel:
+        if self.firmness > 1500:
+            return FirmnessLevel.TOO_HARD
+        elif self.firmness < 500:
+            return FirmnessLevel.TOO_SOFT
+        else:
+            return FirmnessLevel.READY
+
+
+class MangoLabel(SweetFruitLabel):
+    def __init__(self, _init_weight: int, _end_weight: int, _storage_days: int, _firmness: int, _sugar_content: float,
+                 _ripeness_state: RipenessState, _comment: str = None):
+        super().__init__(_init_weight, _end_weight, _storage_days, _firmness, _sugar_content, _ripeness_state,
+                         _comment)
+
+    def get_sugar_level(self) -> SugarLevel:
+        if self.sugar_content < 14:
+            return SugarLevel.NOT_SWEET
+        elif self.sugar_content > 16:
+            return SugarLevel.TOO_SWEET
+        else:
+            return SugarLevel.READY
+
+    def get_firmness_level(self) -> FirmnessLevel:
+        if self.firmness > 12500:
+            return FirmnessLevel.TOO_HARD
+        elif self.firmness < 5000:
+            return FirmnessLevel.TOO_SOFT
+        else:
+            return FirmnessLevel.READY
+
+class PapayaLabel(SweetFruitLabel):
+    def __init__(self, _init_weight: int, _end_weight: int, _storage_days: int, _firmness: int, _sugar_content: float,
+                 _ripeness_state: RipenessState, _comment: str = None):
+        super().__init__(_init_weight, _end_weight, _storage_days, _firmness, _sugar_content, _ripeness_state,
+                         _comment)
+
+    def get_sugar_level(self) -> SugarLevel:
+        if self.sugar_content is None:
+            return SugarLevel.UNKNOWN
+        elif self.sugar_content < 11.5:
+            return SugarLevel.NOT_SWEET
+        elif self.sugar_content > 13.5:
+            return SugarLevel.TOO_SWEET
+        else:
+            return SugarLevel.READY
+
+    def get_firmness_level(self) -> FirmnessLevel:
+        if self.firmness is None:
+            return FirmnessLevel.UNKNOWN
+        elif self.firmness > 2000:
+            return FirmnessLevel.TOO_HARD
+        elif self.firmness < 1000:
+            return FirmnessLevel.TOO_SOFT
+        else:
+            return FirmnessLevel.READY
+
 
 class FruitRecord:
     def __init__(self, fruit: Fruit, side: Side, day: Day, id: ID, camera_type: CameraType,
-                 label: Union[AvocadoLabel, KiwiLabel] = None):
+                 label: Optional[Union[AvocadoLabel, SweetFruitLabel]] = None):
         self.fruit = fruit
         self.id = id
         self.side = side
@@ -381,7 +491,7 @@ class FruitRecord:
         self.label = label
 
     def get_file_path(self):
-        return get_file_path(self.fruit, self.side, self.day,  self.id, self.camera_type)
+        return get_file_path(self.fruit, self.side, self.day, self.id, self.camera_type)
 
     def get_name(self):
         return get_name(self.fruit, self.id, self.side, self.day)
@@ -392,11 +502,14 @@ class FruitRecord:
     def load(self, _origin=None, is_already_referenced=False):
         # print("# Load cube: %s " % self.get_unique_name())
 
-        if self.camera_type in (CameraType.VIS, CameraType.NIR):
+        if self.camera_type in (CameraType.VIS, CameraType.NIR,
+                                CameraType.VIS_COR):
             if is_already_referenced:
-                header, data = spectral_io.load_envi(self.get_file_path(), _origin)
+                header, data = spectral_io.load_envi(
+                    self.get_file_path(), _origin)
             else:
-                header, data = spectral_io.load_referenced_envi(self.get_file_path(), _origin)
+                header, data = spectral_io.load_referenced_envi(
+                    self.get_file_path(), _origin)
 
             return header, data
 
@@ -405,16 +518,16 @@ class FruitRecord:
 
     def __str__(self):
         if self.is_labeled():
-            return "{%s : %s/%s \n" \
-                   "\ton day: %s\n" \
-                   "\trecored with: %s\n" \
-                   "\thas state: %s}" % (self.fruit.value, self.id.value, self.side.value,
-                                            self.day.value, self.camera_type.value, self.label)
+            return f"{self.fruit.value}: {self.id.value}/{self.side.value} \n" \
+                f"\ton day: {self.day.value}\n" \
+                f"\trecored with: {self.camera_type.value}\n" \
+                f"\thas state: {str(self.label)}" \
+                f"\tpath: {self.get_file_path()}"
         else:
-            return "{%s : %s/%s \n" \
-                "\ton day: %s\n" \
-                "\trecored with: %s}" % (self.fruit.value, self.id.value, self.side.value,
-                                         self.day.value, self.camera_type.value)
+            return f"{self.fruit.value}: {self.id.value}/{self.side.value} \n" \
+                f"\ton day: {self.day.value}\n" \
+                f"\trecored with: {self.camera_type.value}\n" \
+                f"\tpath: {self.get_file_path()}"
 
     def __eq__(self, other: Fruit):
         if not isinstance(other, FruitRecord):

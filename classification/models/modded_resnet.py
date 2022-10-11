@@ -201,8 +201,11 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x):
-        x = self.conv1(x)
+    def forward(self, x, channel_wavelengths=None):
+        if isinstance(self.conv1, nn.Conv2d):
+            x = self.conv1(x)
+        else:
+            x = self.conv1(x, channel_wavelengths=channel_wavelengths)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)

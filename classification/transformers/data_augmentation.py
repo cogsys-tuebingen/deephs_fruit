@@ -2,19 +2,25 @@ import torch
 import math
 import numpy as np
 from core.name_convention import *
+from torchvision.transforms import RandomResizedCrop
 
 AUGMENTATION_CONFIG = {
     'random_flip': True,
     'random_rotate': True,
-    'random_noise': False,
-    'random_cut': True
+    'random_noise': True,
+    'random_cut': True,
+    'random_crop': True,
+    'random_intensity_scale': True
 }
 
 
 class Augmenter(object):
-    def __init__(self, classification_type: ClassificationType, augmentation_config: dict):
-        self.classification_type = classification_type
+    def __init__(self, augmentation_config: dict, input_size: tuple):
         self.augmentation_config = augmentation_config
+        self.input_size = input_size
+
+        if self.augmentation_config['random_crop']:
+            self.random_crop = RandomResizedCrop(self.input_size)
 
     def _random_flip(self, _t: torch.Tensor):
         d = np.random.randint(0, 4)
@@ -39,15 +45,23 @@ class Augmenter(object):
         _mean = _t.mean((1, 2)).expand(h, w, ch).permute(2, 0, 1)
 
         _n = torch.normal(_mean, _std)
-        return _t + (0.8 * _n)
+        return _t + (0.1 * _n)
+
+    def _random_intensity_scale(self, t: torch.Tensor):
+        scale = torch.normal(torch.tensor(1.0), torch.tensor(0.5))
+
+        return t * scale 
+
 
     def _cut_off(self, _t: torch.Tensor):
-        _cut_off_size = 16
-        _center_cut_off = np.random.randint(0, 64, 2)
+        assert _t.shape[1] == _t.shape[2]
+        max_size = _t.shape[1]
+        _cut_off_size = np.random.randint(0, int(max_size / 2), 2)
+        _center_cut_off = np.random.randint(0, self.input_size[0], 2)
         _x_0 = int(max(_center_cut_off[0] - (_cut_off_size / 2), 0))
         _y_0 = int(max(_center_cut_off[1] - (_cut_off_size / 2), 0))
-        _x_1 = int(min(_center_cut_off[0] + (_cut_off_size / 2), 63))
-        _y_1 = int(min(_center_cut_off[1] + (_cut_off_size / 2), 63))
+        _x_1 = int(min(_center_cut_off[0] + (_cut_off_size / 2), max_size - 1))
+        _y_1 = int(min(_center_cut_off[1] + (_cut_off_size / 2), max_size - 1))
 
         _t[:, _x_0:_x_1, _y_0:_y_1] = 0
         return _t
@@ -150,14 +164,16 @@ class Augmenter(object):
 
         # make a meshgrid of normal coordinates
         _coords = self._iterproduct(x.size(1), x.size(2))
-        coords = _coords.unsqueeze(0).repeat(x.size(0), 1, 1).float().to(x.device)
+        coords = _coords.unsqueeze(0).repeat(
+            x.size(0), 1, 1).float().to(x.device)
 
         if center:
             # shift the coordinates so center is the origin
             coords[:, :, 0] = coords[:, :, 0] - (x.size(1) / 2. - 0.5)
             coords[:, :, 1] = coords[:, :, 1] - (x.size(2) / 2. - 0.5)
         # apply the coordinate transformation
-        new_coords = coords.bmm(A_batch.transpose(1, 2)) + b_batch.expand_as(coords)
+        new_coords = coords.bmm(A_batch.transpose(
+            1, 2)) + b_batch.expand_as(coords)
 
         if center:
             # shift the coordinates back so origin is origin
@@ -169,6 +185,8 @@ class Augmenter(object):
             x_transformed = self._nearest_interp2d(x.contiguous(), new_coords)
         elif mode == 'bilinear':
             x_transformed = self._bilinear_interp2d(x.contiguous(), new_coords)
+        else:
+            x_transformed = None
 
         return x_transformed
 
@@ -193,8 +211,10 @@ class Augmenter(object):
                                   mode='nearest')
         return input_tf
 
-    def _random_cut(self, x, ratio=1 / 2):
+    def _random_cut(self, x, max_ratio=1 / 2):
         h, w = x.shape[1:]
+
+        ratio = np.random.rand(1) * max_ratio
 
         cut_w = int(w * ratio)
         cut_h = int(h * ratio)
@@ -203,20 +223,25 @@ class Augmenter(object):
         pos_y = np.random.randint(0 - cut_h, h)
 
         x = x.clone()
-        x[:, max(0, pos_x):min(w, pos_x + cut_w), max(0, pos_y):min(h, pos_y + cut_h)] = 0
+        x[:, max(0, pos_x):min(w, pos_x + cut_w),
+          max(0, pos_y):min(h, pos_y + cut_h)] = 0
 
         return x
 
     def __call__(self, batch):
-        x, y = batch
+        x, y, channel_wavelengths = batch
 
-        if self.augmentation_config['random_flip']:
+        if self.augmentation_config['random_flip'] and np.random.rand(1) > 0.5:
             x = self._random_flip(x)
-        if self.augmentation_config['random_rotate']:
+        if self.augmentation_config['random_rotate'] and np.random.rand(1) > 0.5:
             x = self._random_rotate(x)
-        if self.augmentation_config['random_noise']:
+        if self.augmentation_config['random_intensity_scale'] and np.random.rand(1) > 0.5:
+            x = self._random_intensity_scale(x)
+        if self.augmentation_config['random_noise'] and np.random.rand(1) > 0.5:
             x = self._random_noise_v2(x)
-        if self.augmentation_config['random_cut']:
+        if self.augmentation_config['random_crop'] and np.random.rand(1) > 0.9:
+            x = self.random_crop(x)
+        if self.augmentation_config['random_cut'] and np.random.rand(1) > 0.5:
             x = self._random_cut(x)
 
-        return x, y
+        return x, y, channel_wavelengths
