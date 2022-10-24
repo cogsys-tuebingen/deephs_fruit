@@ -10,7 +10,7 @@
 Here you can find the dataset and the official implementation of the HS-CNN network with an optimized training pipeline.
 
 ## Data set (v2)
-The dataset is [here](https://cloud.cs.uni-tuebingen.de/index.php/s/nWKxxtN5wM9fz5E) available. 
+The dataset is [here](https://cloud.cs.uni-tuebingen.de/index.php/s/3gXr3o3gmYSbAq9) available. 
 It contains recordings of:
  - Avocados
  - Kiwis
