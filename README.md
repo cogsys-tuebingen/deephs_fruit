@@ -10,7 +10,7 @@
 Here you can find the dataset and the official implementation of the HS-CNN network with an optimized training pipeline.
 
 ## Data set (v2)
-The dataset is [here](https://cogsys.cs.uni-tuebingen.de/webprojects/Deepths-Fruits-2023-Datasets/) or as [torrent](https://cogsys.cs.uni-tuebingen.de/webprojects/Deepths-Fruits-2023-Datasets/Deepths-Fruits-2023-Datasets.torrent) available. 
+The dataset is [here](https://cogsys.cs.uni-tuebingen.de/webprojects/DeepHS-Fruit-2023-Datasets/) or as [torrent](https://cogsys.cs.uni-tuebingen.de/webprojects/DeepHS-Fruit-2023-Datasets/DeepHS-Fruit-2023-Datasets.torrent) available. 
 It contains recordings of:
  - Avocados
  - Kiwis
