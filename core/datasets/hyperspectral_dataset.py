@@ -207,8 +207,8 @@ def extend_too_unsweet_recordings(records: [FruitRecord]):
     return records
 
 def get_records(fruit, camera_type, classification_type,
-                extend_by_time_assumption=False, use_inter_ripeness_levels=False, allow_all_fruit_types=False,
-                use_new_recordings=False
+                extend_by_time_assumption=False, use_inter_ripeness_levels=False, allow_all_fruit_types=True,
+                use_new_recordings=True
                ):
 
     full_set = all_fruits_new if use_new_recordings else all_fruits
