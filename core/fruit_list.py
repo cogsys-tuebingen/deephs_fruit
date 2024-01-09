@@ -252,8 +252,8 @@ def to_json(records):
                'comment': r.label.comment,
                }
 
-        if isinstance(r.label, KiwiLabel):
-            a_j['sugar_content']: r.label.sugar_content
+        if isinstance(r.label, SweetFruitLabel):
+            a_j['sugar_content']= r.label.sugar_content
 
         if r.label.ripeness_state == RipenessState.NEAR_OVERRIPE:
             rs = RipenessState.OVERRIPE
