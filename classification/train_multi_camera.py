@@ -211,7 +211,7 @@ def main(hparams):
         mode='min'
     )
 
-    trainer = lightning.Trainer(max_epochs=opt.num_epochs, gpus=-1, logger=logger,
+    trainer = lightning.Trainer(max_epochs=opt.num_epochs, gpus=0, logger=logger,
                                 strategy='ddp',
                                 min_epochs=50,
                                 callbacks=[LRLoggingCallback(),

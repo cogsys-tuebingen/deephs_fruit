@@ -1,0 +1,45 @@
+{
+  "os": "Windows-10-10.0.22631-SP0",
+  "python": "3.10.0",
+  "startedAt": "2024-09-16T07:30:04.140214Z",
+  "args": [
+    "--data_path",
+    "D:\\College\\Project",
+    "--model",
+    "deephs_net",
+    "--fruit",
+    "mango",
+    "--classification_type",
+    "ripeness",
+    "--seed",
+    "23312323",
+    "--num_epochs",
+    "1"
+  ],
+  "program": "C:\\Users\\intha\\deephs_fruit\\classification\\train.py",
+  "codePath": "classification\\train.py",
+  "git": {
+    "remote": "https://github.com/hut22929/deephs_fruit.git",
+    "commit": "e74580eea097ac4af5f40b10344603c5fb7e93a3"
+  },
+  "root": "C:\\Users\\intha\\deephs_fruit",
+  "host": "Hut",
+  "username": "intha",
+  "executable": "C:\\Users\\intha\\deephs_fruit\\venv\\Scripts\\python.exe",
+  "codePathLocal": "classification\\train.py",
+  "cpu_count": 4,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "148813901824",
+      "used": "145958666240"
+    }
+  },
+  "memory": {
+    "total": "12674457600"
+  },
+  "cpu": {
+    "count": 4,
+    "countLogical": 8
+  }
+}

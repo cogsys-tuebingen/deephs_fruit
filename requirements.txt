@@ -1,4 +1,10 @@
-h5py==2.10.0
+#upgrade h5py ,wandb,pytorch-lightning
+#hey
+h5py==3.11.0
+wandb==0.18.0
+pytorch-lightning==1.5.10
+
+#classic
 image==1.5.32
 imageio==2.8.0
 matplotlib==3.5.3
@@ -8,7 +14,6 @@ opencv-python==4.6.0.66
 PyExifTool==0.1.1
 pyparsing==3.0.9
 python-dateutil==2.8.2
-pytorch-lightning==1.7.6
 scikit-image==0.19.2
 scikit-learn==1.0.2
 scipy==1.8.0
@@ -26,6 +31,6 @@ torchvision==0.12.0
 tornado==6.2
 tqdm==4.64.1
 urllib3==1.26.12
-wandb==0.13.3
+
 
 

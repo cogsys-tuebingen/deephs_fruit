@@ -1,9 +1,14 @@
+
+#get cpu num core py os
+import os
+
+
 import argparse
 
 import pytorch_lightning as lightning
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from pytorch_lightning.loggers.wandb import WandbLogger
+from pytorch_lightning.loggers import WandbLogger
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms 
@@ -25,6 +30,14 @@ from core.run_utils import (
     get_wandb_log_dir,
 )
 import core.util as util
+
+import wandb
+import torch
+
+
+
+
+
 
 AUGMENTATION_CONFIG_TRAIN = {
     'random_flip': True,
@@ -321,7 +334,7 @@ def get_parser():
                         help="the root folder of dataset")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--log_path", type=str, default=None)
-    parser.add_argument("--online_logging", default=False, action='store_true')
+    parser.add_argument("--online_logging", default=True, action='store_true') #online logging true
     parser.add_argument("--debug", default=False, action='store_true')
     parser.add_argument("--model_checkpoint", default=None, type=str)
 
@@ -363,8 +376,12 @@ def main(hparams):
     print("Hparams: %s" % hparams)
 
     model = DeepHsModule(hparams)
-    logger = WandbLogger(offline=not hparams['online_logging'], save_dir=hparams['log_path'],
-                         project='deephs') if 'logger' not in hparams.keys() else hparams['logger']
+    logger = WandbLogger(
+    offline=not hparams.get('online_logging', True),  # Use parentheses here
+    save_dir=hparams.get('log_path', './logs'),
+    project='deephs') if 'logger' not in hparams else hparams['logger']
+
+    
 
     early_stop_callback = EarlyStopping(
         monitor='val/loss',
@@ -382,12 +399,17 @@ def main(hparams):
         mode='min'
     )
 
+
+
+    
+
+    num_cpu_cores = os.cpu_count() #ใช้ cpu 
     trainer = lightning.Trainer(max_epochs=opt.num_epochs,
-                                accelerator='gpu',
-                                devices=-1,
+                                accelerator='cpu',
+                                devices=1,
                                 logger=logger,
-                                strategy='ddp',
-                                min_epochs=50,
+                                strategy=None,
+                                min_epochs=2,
                                 callbacks=[LRLoggingCallback(),
                                            early_stop_callback,
                                            checkpoint_callback
@@ -408,7 +430,8 @@ def main(hparams):
 
 if __name__ == "__main__":
     opt = get_args()
-    num_gpus = torch.cuda.device_count()
+    #ปิด gpu
+    #num_gpus = torch.cuda.device_count()
 
     # fix the seed for reproducibility
     seed = opt.seed

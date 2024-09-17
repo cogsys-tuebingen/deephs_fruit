@@ -1,0 +1,4 @@
+[default]
+
+[set WANDB_MODE=online]
+
