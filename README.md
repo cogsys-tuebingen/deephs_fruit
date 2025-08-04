@@ -5,7 +5,7 @@
         - Added new hyperspectral recordings
         - Added HyveConv++ model
 
-    Version 1 is still avaiable on branch 'paper_version' 
+    Version 1 is still available on branch 'paper_version' 
 
 Here you can find the dataset and the official implementation of the HS-CNN network with an optimized training pipeline.
 
